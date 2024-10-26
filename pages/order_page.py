@@ -1,10 +1,13 @@
+import pytest
 from pages.base_page import BasePage
 from locators.order_page_locators import OrderButtonLocators, OrderFormPart1Locators, OrderFormPart2Locators, OrderPopUpLocators
 from data import UserData
 import allure
 
-#Оформление заказа
+
+# Оформление заказа
 class OrderPage(BasePage):
+
     @allure.step('Перейти на форму заказа через кнопку "Заказать" в верху страницы')
     def check_button_to_order_top(self):
         self.click_element(OrderButtonLocators.BUTTON_TO_ORDER_TOP)
@@ -16,45 +19,34 @@ class OrderPage(BasePage):
         self.click_element(OrderButtonLocators.BUTTON_TO_ORDER_CENTER)
         return self.find_element_webdriverwait(OrderFormPart1Locators.FIELD_NAME)
 
-    @allure.step('Заполнить 1 часть формы заказа с 1 набором данных пользователя')
-    def add_user_data_1_to_form_order_part_1(self):
-        self.add_text_to_element(OrderFormPart1Locators.FIELD_NAME, UserData.name_1)
-        self.add_text_to_element(OrderFormPart1Locators.FIELD_LAST_NAME, UserData.last_name_1)
-        self.add_text_to_element(OrderFormPart1Locators.FIELD_ADDRESS, UserData.address_1)
+    @allure.step('Заполнить форму заказа')
+    @pytest.mark.parametrize(
+        "name, last_name, address, metro, phone, calendar_date, rental_day, comment_for_courier",
+        [
+            (UserData.name_1, UserData.last_name_1, UserData.address_1, OrderFormPart1Locators.METRO_CHERKIZOVSKAYA,
+             UserData.phone_1, OrderFormPart2Locators.CALENDAR_DATA_30, OrderFormPart2Locators.RENT_1_DAY,
+             UserData.comment_for_courier_empty),
+            (UserData.name_2, UserData.last_name_2, UserData.address_2, OrderFormPart1Locators.METRO_SOKOLNIKI,
+             UserData.phone_2, OrderFormPart2Locators.CALENDAR_DATA_31, OrderFormPart2Locators.RENT_3_DAYS,
+             UserData.comment_for_courier_1)
+        ],
+        ids=['Оформление заказа с данными пользователя 1', 'Оформление заказа с данными пользователя 2']
+    )
+    def add_user_data_to_form_order(self, name, last_name, address, metro, phone, calendar_date, rental_day,
+                                    comment_for_courier):
+        self.add_text_to_element(OrderFormPart1Locators.FIELD_NAME, name)
+        self.add_text_to_element(OrderFormPart1Locators.FIELD_LAST_NAME, last_name)
+        self.add_text_to_element(OrderFormPart1Locators.FIELD_ADDRESS, address)
         self.click_element(OrderFormPart1Locators.FIELD_METRO)
-        self.click_element(OrderFormPart1Locators.METRO_CHERKIZOVSKAYA)
-        self.add_text_to_element(OrderFormPart1Locators.FIELD_PHONE, UserData.phone_1)
+        self.click_element(metro)
+        self.add_text_to_element(OrderFormPart1Locators.FIELD_PHONE, phone)
         self.click_element(OrderFormPart1Locators.BUTTON_NEXT)
-        return self.find_element_webdriverwait(OrderFormPart2Locators.FIELD_DATA_ORDER)
-
-    @allure.step('Заполнить 2 часть формы заказа с 1 набором данных пользователя')
-    def add_user_data_1_to_form_order_part_2(self):
         self.click_element(OrderFormPart2Locators.FIELD_DATA_ORDER)
-        self.click_element(OrderFormPart2Locators.CALENDAR_DATA_30)
+        self.click_element(calendar_date)
         self.click_element(OrderFormPart2Locators.FIELD_RENTAL_PERIOD)
-        self.click_element(OrderFormPart2Locators.RENT_1_DAY)
-        self.click_element(OrderFormPart2Locators.BUTTON_TO_ORDER_IN_FORM)
-        return self.find_element_webdriverwait(OrderPopUpLocators.BUTTON_YES_ORDER)
-
-    @allure.step('Заполнить 1 часть формы заказа с 2 набором данных пользователя')
-    def add_user_data_2_to_form_order_part_1(self):
-        self.add_text_to_element(OrderFormPart1Locators.FIELD_NAME, UserData.name_2)
-        self.add_text_to_element(OrderFormPart1Locators.FIELD_LAST_NAME, UserData.last_name_2)
-        self.add_text_to_element(OrderFormPart1Locators.FIELD_ADDRESS, UserData.address_2)
-        self.click_element(OrderFormPart1Locators.FIELD_METRO)
-        self.click_element(OrderFormPart1Locators.METRO_SOKOLNIKI)
-        self.add_text_to_element(OrderFormPart1Locators.FIELD_PHONE, UserData.phone_2)
-        self.click_element(OrderFormPart1Locators.BUTTON_NEXT)
-        return self.find_element_webdriverwait(OrderFormPart2Locators.FIELD_DATA_ORDER)
-
-    @allure.step('Заполнить 2 часть формы заказа с 2 набором данных пользователя')
-    def add_user_data_2_to_form_order_part_2(self):
-        self.click_element(OrderFormPart2Locators.FIELD_DATA_ORDER)
-        self.click_element(OrderFormPart2Locators.CALENDAR_DATA_31)
-        self.click_element(OrderFormPart2Locators.FIELD_RENTAL_PERIOD)
-        self.click_element(OrderFormPart2Locators.RENT_3_DAYS)
+        self.click_element(rental_day)
         self.click_element(OrderFormPart2Locators.CHECKBOX_BLACK_COLOR)
-        self.add_text_to_element(OrderFormPart2Locators.FIELD_COMMENT_FOR_COURIER, UserData.comment_for_courier)
+        self.add_text_to_element(OrderFormPart2Locators.FIELD_COMMENT_FOR_COURIER, comment_for_courier)
         self.click_element(OrderFormPart2Locators.BUTTON_TO_ORDER_IN_FORM)
         return self.find_element_webdriverwait(OrderPopUpLocators.BUTTON_YES_ORDER)
 

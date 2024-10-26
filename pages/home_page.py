@@ -2,7 +2,8 @@ from pages.base_page import BasePage
 from locators.home_page_locators import HomePageLocators
 import allure
 
-#Вопросы о важном, домашняя страница
+
+# Вопросы о важном, домашняя страница
 class HomePage(BasePage):
     @allure.step('Получить текст вопросов')
     def check_question_text(self, num):
@@ -18,5 +19,3 @@ class HomePage(BasePage):
         self.scroll_to_element(HomePageLocators.LOCATOR_QUESTION_8)
         self.click_element(locator_q_formatted)
         return self.get_text_from_element(locator_a_formatted)
-
-

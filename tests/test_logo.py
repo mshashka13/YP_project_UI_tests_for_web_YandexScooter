@@ -1,6 +1,5 @@
 from pages.logo import Logo
 from data import Url
-import time
 import allure
 
 
@@ -13,16 +12,8 @@ class TestLogo:
     def test_check_logo_yandex_open_new_window_dzen(self, driver):
         driver.get(Url.URL_HOME)
         logo = Logo(driver)
-        original_window = driver.current_window_handle
-        logo.check_logo_yandex_open_new_window_dzen()
-        time.sleep(2)
-        all_windows = driver.window_handles
-        assert len(all_windows) > 1
-        for window in all_windows:
-            if window != original_window:
-                driver.switch_to.window(window)
-        current_url = driver.current_url
-        assert Url.URL_YANDEX_DZEN in current_url
+        new_url = logo.check_logo_yandex_open_new_window_dzen()
+        assert Url.URL_YANDEX_DZEN in new_url
 
     @allure.title('Проверка перехода на домашнюю страницу "ЯндексСамокат" при клике на логотип "Самокат"')
     @allure.description(
